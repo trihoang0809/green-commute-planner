@@ -5,8 +5,6 @@ import os.path
 import calendarDataRetriever
 import auth
 import streamlit as st
-import maps
-# import plotly.express as px
 from streamlit.logger import get_logger
 
 from google.auth.transport.requests import Request
@@ -55,6 +53,7 @@ def main():
     'Which method of transportation do you log?',
     ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
     if st.button("Log", type="primary"):
+        # Do something else
         st.write(transportation)
 
 def display_events(pathDistances):  # [(toStartTime, fromEventName, toEventName, dist)]
