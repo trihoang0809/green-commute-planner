@@ -27,4 +27,5 @@ def userAuthorization():
         # Save the credentials for the next run
         # with open('token.json', 'w') as token:
         #     token.write(creds.to_json())
+    print("CREDS: ", creds, "\n\n\n\n\n\n")
     return creds

@@ -5,7 +5,8 @@ import os.path
 import calendarDataRetriever
 import auth
 import streamlit as st
-import plotly.express as px
+import maps
+# import plotly.express as px
 from streamlit.logger import get_logger
 
 from google.auth.transport.requests import Request
@@ -17,16 +18,19 @@ from googleapiclient.errors import HttpError
 
 LOGGER = get_logger(__name__)
 
-def run():
+def run():    
     st.set_page_config(
         page_title="Green Commute",
         page_icon="🛴",
     )
 
     st.write("# Green Commute Planner")
+    
+    print("HELLO")
 
     if st.button("Log in", type="primary"):
         creds = auth.userAuthorization()
+        print("HELLO")
         return creds
     
 def main():
@@ -37,8 +41,15 @@ def main():
     weekLocations = calendarDataRetriever.getWeekLocations(creds)
     print(weekLocations)
     
-    # Display locations on website.
-    display_events(weekLocations)
+    # Get all paths for the week and calculate the path distance.
+    pathDistances = []
+    for i in range(len(weekLocations)-1):
+        fromLoc, toLoc = weekLocations[i], weekLocations[i+1]
+        dist = maps.getPathDistance(fromLoc, toLoc)
+        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist)) # (toStartTime, fromEventName, toEventName, dist)
+        
+    # Display path distances on site.
+    display_events(pathDistances)
 
     transportation = st.selectbox(
     'Which method of transportation do you log?',
@@ -46,32 +57,16 @@ def main():
     if st.button("Log", type="primary"):
         st.write(transportation)
 
-
-def plot_user_points(days_of_week, user_points):
-    # Create a line plot using Plotly Express
-    fig = px.line(x=days_of_week, y=user_points, markers=True)
-    fig.update_layout(title='Points for each day of the week',
-                      xaxis_title='Day of the Week', yaxis_title='Points')
-
-    # Display the plot using Streamlit
-    st.plotly_chart(fig)
-# Sample data
-# days_of_week = ['Monday', 'Tuesday', 'Wednesday',
-#                'Thursday', 'Friday', 'Saturday', 'Sunday']
-#user_points = [10, 15, 20, 18, 22, 17, 14]
-# Call the function to plot the chart
-#plot_user_points(days_of_week, user_points)
-
-
-def display_events(weekLocations):
-    if not weekLocations:
+def display_events(pathDistances):  # [(toStartTime, fromEventName, toEventName, dist)]
+    if not pathDistances:
         st.write("No upcoming events found.")
         return
     # Loop through events and display them
-    for loc in weekLocations: # loc is of form (eventName, UTCTime, location)
-        st.write(f"**Event:** {loc[0]}")
-        st.write(f"**Start Time:** {loc[1]}")
-        st.write(f"**Location:** {loc[2]}")
+    for path in pathDistances: # loc is of form (eventName, UTCTime, location)
+        st.write(f"**Time When User Finishes Path:** {path[0]}")
+        st.write(f"**Starting Location:** {path[1]}")
+        st.write(f"**Ending Location:** {path[2]}")
+        st.write(f"**Path Distance:** {path[3]}")
         st.write("---")
 
 if __name__ == '__main__':

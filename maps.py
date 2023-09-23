@@ -5,6 +5,9 @@ import urllib.parse
 import os
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 
+#
+# Gets the distance between two paths in units according to Distance Matrix from Google Maps API.
+# 
 def getPathDistance(fromEvent, toEvent): # inputs are of form (eventName, startTime, location)
     fromLocation = fromEvent[2]
     toLocation = toEvent[2]
@@ -23,17 +26,19 @@ def getPathDistance(fromEvent, toEvent): # inputs are of form (eventName, startT
     json_data = requests.get(http_request).json()
     print(json_data)
     
-    # Print the distance
-    st.write(fromLocation)
-    st.write(toLocation)
-    st.write(json_data.get("rows")[0].get("elements")[0].get("distance").get("text"))
-    st.write(json_data.get("rows")[0].get("elements")[0].get("distance").get("value"))
-
-def main():
-    fromEvent = ('TEST 2', '2023-09-24T10:00:00-05:00', 'Martel College, 99 Sunset Blvd, Houston, TX 77005, USA')
-    toEvent = ('HELLO WORLD', '2023-09-24T10:00:00-05:00', 'Duncan College, 1601 Rice Boulevard, Houston, TX 77005, USA')
-    getPathDistance(fromEvent, toEvent)
+    # st.write(fromLocation)
+    # st.write(toLocation)
+    # st.write(json_data.get("rows")[0].get("elements")[0].get("distance").get("text"))
+    # st.write(json_data.get("rows")[0].get("elements")[0].get("distance").get("value"))
     
-if __name__ == '__main__':
-    main()
+    # Return the distance given in units
+    return json_data.get("rows")[0].get("elements")[0].get("distance").get("value")
+
+# def main():
+#     fromEvent = ('TEST 2', '2023-09-24T10:00:00-05:00', 'Rockefeller Center, 45 Rockefeller Plaza, New York, NY 10111, USA')
+#     toEvent = ('HELLO WORLD', '2023-09-24T10:00:00-05:00', 'Duncan College, 1601 Rice Boulevard, Houston, TX 77005, USA')
+#     getPathDistance(fromEvent, toEvent)
+    
+# if __name__ == '__main__':
+#     main()
 
