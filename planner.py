@@ -70,4 +70,6 @@ def display_events(pathDistances):  # [(toStartTime, fromEventName, toEventName,
         st.write("---")
 
 if __name__ == '__main__':
-    main()
+    # Check if 'started' key exists in session_state, if not, run main.
+    if not st.session_state.get('started'):
+        main()

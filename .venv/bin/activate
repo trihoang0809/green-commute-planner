@@ -41,8 +41,9 @@ deactivate nondestructive
 VIRTUAL_ENV="/Users/Bryce/Desktop/Hackathon/green-commute-planner/.venv"
 export VIRTUAL_ENV
 
-# GOOGLE MAPS API KEY ENV VARIABLE:
+# GOOGLE API STUFF:
 export GOOGLE_MAPS_API_KEY=AIzaSyBwQ7sisRdtFplasAVzOjPtGQn_zq7cedI
+export GOOGLE_APPLICATION_CREDENTIALS="./credentials.json"
 
 _OLD_VIRTUAL_PATH="$PATH"
 PATH="$VIRTUAL_ENV/bin:$PATH"
