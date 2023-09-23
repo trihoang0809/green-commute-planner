@@ -4,7 +4,6 @@ import urllib.parse
 
 import os
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
-print("HELLOOOO", GOOGLE_MAPS_API_KEY)
 
 def getPathDistance(fromEvent, toEvent): # inputs are of form (eventName, startTime, location)
     fromLocation = fromEvent[2]
