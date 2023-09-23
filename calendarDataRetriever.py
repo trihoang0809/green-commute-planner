@@ -24,7 +24,7 @@ def getWeekLocations(creds):
         for event in events:
             # start = event['start'].get('dateTime', event['start'].get('date'))
             # print(start, event['location'])
-            locations.append(event['location'])
+            locations.append((event['summary'], event['location'])) # (eventName, location)
         return locations
         
     except HttpError as error:
