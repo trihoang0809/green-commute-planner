@@ -5,6 +5,7 @@ import os.path
 import calendarDataRetriever
 import auth
 import streamlit as st
+import plotly.express as px
 from streamlit.logger import get_logger
 
 from google.auth.transport.requests import Request
@@ -28,7 +29,6 @@ def run():
         creds = auth.userAuthorization()
         return creds
     
-    
 def main():
     # Set up config for website? (Authenticate the user in order to pull their data for Google Calendar API.)
     creds = run()
@@ -45,6 +45,22 @@ def main():
     ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
     if st.button("Log", type="primary"):
         st.write(transportation)
+
+
+def plot_user_points(days_of_week, user_points):
+    # Create a line plot using Plotly Express
+    fig = px.line(x=days_of_week, y=user_points, markers=True)
+    fig.update_layout(title='Points for each day of the week',
+                      xaxis_title='Day of the Week', yaxis_title='Points')
+
+    # Display the plot using Streamlit
+    st.plotly_chart(fig)
+# Sample data
+# days_of_week = ['Monday', 'Tuesday', 'Wednesday',
+#                'Thursday', 'Friday', 'Saturday', 'Sunday']
+#user_points = [10, 15, 20, 18, 22, 17, 14]
+# Call the function to plot the chart
+#plot_user_points(days_of_week, user_points)
 
 
 def display_events(weekLocations):
