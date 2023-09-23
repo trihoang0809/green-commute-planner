@@ -5,6 +5,7 @@ import os.path
 import calendarDataRetriever
 import auth
 import streamlit as st
+import maps
 from streamlit.logger import get_logger
 
 from google.auth.transport.requests import Request
