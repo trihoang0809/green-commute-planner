@@ -44,10 +44,10 @@ def display_events(weekLocations):
         st.write("No upcoming events found.")
         return
     # Loop through events and display them
-    for loc in weekLocations:
+    for loc in weekLocations: # loc is of form (eventName, UTCTime, location)
         st.write(f"**Event:** {loc[0]}")
-        # st.write(f"**Start Time:** {loc['start']}")
-        st.write(f"**Location:** {loc[1]}")
+        st.write(f"**Start Time:** {loc[1]}")
+        st.write(f"**Location:** {loc[2]}")
         st.write("---")
 
 if __name__ == '__main__':
