@@ -58,11 +58,5 @@ def main():
     except HttpError as error:
         print(f'An error occurred: {error}')
 
-
-if __name__ == '__main__':
-    main()
-
-
-
 if __name__ == '__main__':
     main()
