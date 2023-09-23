@@ -23,6 +23,9 @@ def run():
     )
 
     st.write("# Green Commute Planner")
+
+    if st.button("Log in", type="primary"):
+        auth.userAuthorization()
     
 def main():
     # Set up config for website?
@@ -37,6 +40,12 @@ def main():
     
     # Display locations on website.
     display_events(weekLocations)
+
+    transportation = st.selectbox(
+    'Which method of transportation do you log?',
+    ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
+    if st.button("Log", type="primary"):
+        st.write(transportation)
     
 
 def display_events(weekLocations):
