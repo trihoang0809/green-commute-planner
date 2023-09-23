@@ -45,7 +45,7 @@ def main():
     ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
     if st.button("Log", type="primary"):
         st.write(transportation)
-    
+
 
 def plot_user_points(days_of_week, user_points):
     # Create a line plot using Plotly Express
