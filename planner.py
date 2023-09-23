@@ -25,15 +25,13 @@ def run():
     st.write("# Green Commute Planner")
 
     if st.button("Log in", type="primary"):
-        auth.userAuthorization()
+        creds = auth.userAuthorization()
+        return creds
     
 def main():
-    # Set up config for website?
-    run()
-        
-    # Authenticate the user in order to pull their data for Google Calendar API.
-    creds = auth.userAuthorization()
-    
+    # Set up config for website? (Authenticate the user in order to pull their data for Google Calendar API.)
+    creds = run()
+
     # Get all locations in Google Calendar for until the next week from now.
     weekLocations = calendarDataRetriever.getWeekLocations(creds)
     print(weekLocations)
