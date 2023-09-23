@@ -10,3 +10,11 @@ firebase_admin.initialize_app(cred)
 
 # Get a Firestore client
 firestore_client = firestore.client()
+
+doc_ref = firestore_client.collection("laptops").document("1")
+doc_ref.set(
+    {
+        "name": "HP EliteBook Model 1",
+        "brand": "HP",
+    }
+)
