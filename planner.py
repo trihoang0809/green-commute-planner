@@ -44,6 +44,7 @@ def main():
     'Which method of transportation do you log?',
     ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
     if st.button("Log", type="primary"):
+        # Do something else
         st.write(transportation)
 
 
