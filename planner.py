@@ -51,6 +51,7 @@ def site_config():
     st.write("<h1 style='text-align: center;'>Green Commute Planner</h1>",unsafe_allow_html=True)
     st.write("\n")
 
+creds = auth.userAuthorization()
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data
@@ -59,7 +60,6 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         pass
     with col2:
         center_button = st.button("Input your 7-day calendar", type="primary")
-        creds = auth.userAuthorization()
         if center_button:
             if creds:
                 print("getting locations...")
@@ -254,9 +254,7 @@ def makeModeButton():
 
 def log_to_firestore(path, mode):
     # Assume you have some way of identifying the current user
-    # For example, if you have set up Firebase Authentication
-    # user_id = auth.get_current_user_id()
-    user_id = "some_unique_user_id"  # Mock-up user ID for demonstration
+    user_id = creds.id_token
     
     # Prepare data
     data = {
