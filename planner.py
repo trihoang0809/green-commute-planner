@@ -53,10 +53,26 @@ def getPaths(weekLocations): # Finds the paths given event locations for the wee
     for i in range(len(weekLocations)-1):
         fromLoc, toLoc = weekLocations[i], weekLocations[i+1]
         dist_str, dist_units = maps.getPathDistance(fromLoc, toLoc)
-        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist_str)) # (toStartTime, fromEventName, toEventName, dist)
+        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist_str, dist_units)) # (toStartTime, fromEventName, toEventName, dist in km, dist in Google Maps units)
     return pathDistances
         
-
+def pathsToModePoints(pathDistances): # gets pathDistances and maps (path) : {mode: points}
+    print("\nConverting pathDistances to map (path) : dict(mode: point) ...\n")
+    
+    result_dict = {}
+    for path in pathDistances:
+        dist = path[4]
+        fromLocation = path[1]
+        toLocation = path[2]
+        
+        result_dict[(fromLocation, toLocation)] = {}
+        result_dict[(fromLocation, toLocation)]["car"] = (-1 * dist // 100)
+        result_dict[(fromLocation, toLocation)]["bus"] = (1 * dist // 100)
+        result_dict[(fromLocation, toLocation)]["bike"] = (2 * dist // 100)
+        result_dict[(fromLocation, toLocation)]["walk"] = (3 * dist // 100)
+    
+    return result_dict
+        
     
 def main():
     site_config()
@@ -64,7 +80,7 @@ def main():
     weekLocations = get_calendar_info()
     st.write("\n")
     
-    # Get all paths for the week and calculate the path distance.
+    # Get all paths for the week and calculate the paths' distances.
     pathDistances = None
     if weekLocations:
         pathDistances = getPaths(weekLocations)
@@ -74,15 +90,18 @@ def main():
         cols = st.columns(2)
         for row in range(len(pathDistances)):
             add_row(row, pathDistances, cols)
+        # Map the paths to the points for each mode
+        pathsPossiblePoints = pathsToModePoints(pathDistances)
+        print(pathsPossiblePoints)
 
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
-        ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
+        ('walk', 'bike', 'bus', 'car'), placeholder="Choose an Option")
     button = st.button("Log", type="primary")
     return button, transportation
 
-def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventName, dist)]
+def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventName, distInKiloMeters, distInUnits)]
     if not pathDistances:
         st.write("No upcoming events found.")
         return
