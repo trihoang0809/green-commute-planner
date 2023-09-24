@@ -39,6 +39,8 @@ BASE_POINTS_PER_KM = {
     'Car': -5,     # Negative points for driving a car
 }
 
+creds = auth.userAuthorization()
+
 LOGGER = get_logger(__name__)
 db = google.cloud.firestore.Client.from_service_account_json("greencommute-firebase-adminsdk-kcrhl-ea92e0cdba.json")
 
@@ -51,7 +53,6 @@ def site_config():
     st.write("<h1 style='text-align: center;'>Green Commute Planner</h1>",unsafe_allow_html=True)
     st.write("\n")
 
-creds = auth.userAuthorization()
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data
@@ -133,7 +134,7 @@ def main():
         # Add a single Log button to log all selected modes for all paths
         if st.button("Log All"):
             for row, mode in mode_selections.items():
-                log_to_firestore(pathDistances[row], mode)
+                log_to_firestore(pathDistances[row], mode, startDates[row])
             st.info("All data logged.")
     
     #implement the charts and the leaderboard
@@ -252,7 +253,7 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
-def log_to_firestore(path, mode):
+def log_to_firestore(path, mode, start_date):
     # Assume you have some way of identifying the current user
     user_id = creds.id_token
     
@@ -272,6 +273,8 @@ def log_to_firestore(path, mode):
     
     # Add this event data as a new document in the "events" collection inside this user's document
     user_ref.collection("events").add(data)
+
+    
 
 def add_row(row, pathDistances, cols, startDates):
     path = pathDistances[row]
