@@ -42,8 +42,7 @@ BASE_POINTS_PER_KM = {
 LOGGER = get_logger(__name__)
 db = google.cloud.firestore.Client.from_service_account_json("greencommute-firebase-adminsdk-kcrhl-ea92e0cdba.json")
 
-def site_config():
-    # Set up config for website? (Authenticate the user in order to pull their data for Google Calendar API.)
+def site_config(): # Set up configuration for website.
     st.set_page_config(
         page_title="Green Commute",
         page_icon="🛴",
@@ -53,7 +52,7 @@ def site_config():
 
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
-    # Loads in calendar data
+    # Loads in calendar data.
     col1, col2, col3 = st.columns(3)
     with col1:
         pass
@@ -61,7 +60,7 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         center_button = st.button("Input your 7-day calendar", type="primary")
         creds = auth.userAuthorization()
         if center_button:
-            if creds:
+            if creds: # If the user is authorized, get the next week's data and return.
                 print("getting locations...")
                 weekLocations = calendarDataRetriever.getWeekLocations(creds)
                 print("calendar will have new locations...")
@@ -69,13 +68,13 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
                 return weekLocations
         else:
             return calendarDataRetriever.getWeekLocations(creds)
-    with col3 :
+    with col3:
         pass
     return None
         
 def getPaths(weekLocations): # Finds the paths given event locations for the week.
     pathDistances = []
-    for i in range(len(weekLocations)-1):
+    for i in range(len(weekLocations)-1): # Iterate through all pairs of locations to represent paths.
         fromLoc, toLoc = weekLocations[i], weekLocations[i+1]
         dist_str, dist_units = maps.getPathDistance(fromLoc, toLoc)
         pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist_str, dist_units)) # (toStartTime, fromEventName, toEventName, dist in km, dist in Google Maps units)
