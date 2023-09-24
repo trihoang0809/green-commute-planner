@@ -111,7 +111,7 @@ def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventN
         st.write(f"**Path Distance:** {pathDistances[row][3]}")
         st.write("\n")
     with cols[1]:
-        mode = st.text_input('Mode of Transportation Used', key=f'mode{row}') 
+        mode = st.selectbox('Mode of Transportation Used',("Walk", "Bike", "Bus/Train", "Plane", "Car"), key=f'mode{row}') 
         st.write("\n")
     return mode
 
