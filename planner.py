@@ -9,6 +9,7 @@ import maps
 import pandas as pd
 import google.cloud.firestore
 import plotly.express as px
+import time
 
 
 from PIL import Image
@@ -146,11 +147,46 @@ def main():
 
 
 def charts_and_leaderboard():
-    image = Image.open('goldrank.png')
-    st.sidebar.image(image, width=75)
-    st.sidebar.write("Your points this week: 498")
-    st.sidebar.write("Current rank: Gold")
+    # Hardcoded!
+    points = 898
+
+    # Determine rank from points
+    if points >= 1000:
+        imageLink = "goldrank.png"
+        rank= "Gold"
+    elif points >= 800:
+        imageLink = "silverrank.png"
+        rank = "Silver"
+        goal = 1000
+        difference = 200
+    else:
+        imageLink = "bronzerank.png"
+        rank = "Bronze"
+        goal = 800
+        difference = 800
+
+    # Set left sidebar
+    col1, col2, col3, col4 = st.sidebar.columns([1, 2, 1, 1])
+    with col2:
+        st.header(rank+" rank")
+        st.image(imageLink, width=80)
+        
+    with col3:
+        st.title("\n")
+        st.title(str(points)+" Points")
+    # image = Image.open(imageLink)
+    #st.sidebar.image(image, width=75)
     
+    progress_text = "Progress until next badge"
+    my_bar = st.sidebar.progress(0, text=progress_text)
+    time.sleep(1)
+    if rank == "Gold":
+        progressP = 1.0
+    else:
+        progressP = 1-(goal-points)/difference
+    my_bar.progress(progressP, text=progress_text)
+    time.sleep(1)
+
     # Assume the national average carbon footprint is 2.0
     national_average_carbon_footprint = 3.2
 
@@ -189,7 +225,7 @@ def charts_and_leaderboard():
         st.plotly_chart(fig)
 
     # Streamlit app
-    st.sidebar.title("Green Commute Leaderboard and User Points Over Time")
+    st.sidebar.write("<h1 style='text-align: center;'>Leaderboard</h1>",unsafe_allow_html=True)
 
     # Fetch data from Firestore
     users_ref = db.collection(u'users')
@@ -249,6 +285,7 @@ def charts_and_leaderboard():
         st.sidebar.markdown(f"Your average carbon footprint is higher than approximately {percentile * 100:.2f}% of Americans. Consider adopting greener commuting options.")
 
     plot_data_with_averages(days_of_week, carbon_footprint, 'Carbon Footprint for each day of the week', 'Carbon Footprint')
+<<<<<<< Updated upstream
 
 def getUserId():
     usernames = [doc.id for doc in db.collection(u'users').stream()]
@@ -257,6 +294,9 @@ def getUserId():
     # Fetch data for the selected user
     return hash(user_id) + hash(usernames[0])
 
+=======
+        
+>>>>>>> Stashed changes
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
