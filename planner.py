@@ -48,7 +48,7 @@ def site_config():
         page_title="Green Commute",
         page_icon="🛴",
     )
-    st.write("# Green Commute Planner")
+    st.write("<h1 style='text-align: center;'>Green Commute Planner</h1>",unsafe_allow_html=True)
     st.write("\n")
 
 def get_calendar_info(): # Gets locations from Google Calendar API.
@@ -295,7 +295,7 @@ def add_row(row, pathDistances, cols):
     
     with cols[1]:
         options = ["Select a mode"] + [f"{mode} ({points} points)" for mode, points in points_dict.items()]
-        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)  # index=0 sets the default value to "Select a mode"
+        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0, help="Choose your modes of transportation for this trip")  # index=0 sets the default value to "Select a mode"
         st.write("\n")
     
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
