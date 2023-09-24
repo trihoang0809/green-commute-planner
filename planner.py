@@ -61,6 +61,10 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         creds = auth.userAuthorization()
         if center_button:
             if creds: # If the user is authorized, get the next week's data and return.
+                
+                # Log in the user for the application.
+                login(creds)
+                
                 print("getting locations...")
                 weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
                 print("calendar will have new locations...")
@@ -251,6 +255,13 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
+def login(creds):
+    user_id = creds.id_token
+    print("\n\nlogin called. THE USER ID: ", user_id, "\n\n")
+    
+    # user_ref = db.collection(u'users').document(selected_user)
+    # user_data = user_ref.get().to_dict()
+
 def log_to_firestore(path, mode):
     # Assume you have some way of identifying the current user
     # For example, if you have set up Firebase Authentication
@@ -276,6 +287,7 @@ def log_to_firestore(path, mode):
 
 def add_row(row, pathDistances, cols, startDates):
     path = pathDistances[row]
+    distanceString = path[3]
     distance = path[4]
     startDate = startDates[row]
     
@@ -291,7 +303,7 @@ def add_row(row, pathDistances, cols, startDates):
     
     with cols[0]:
         st.write(f"**Path (Start to Finish):** {path[1]} -> {path[2]}")
-        st.write(f"**Path Distance:** {distance} km")
+        st.write(f"**Path Distance:** {distanceString}")
         st.write(f"**Start Date:** {startDate}")
         st.write("\n")
     
