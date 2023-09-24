@@ -275,7 +275,7 @@ def log_to_firestore(path, mode):
 
 def add_row(row, pathDistances, cols):
     path = pathDistances[row]
-    distance = path[4]
+    distance = path[3]
     
     if not pathDistances:
         st.write("No upcoming events found.")
@@ -289,7 +289,7 @@ def add_row(row, pathDistances, cols):
     
     with cols[0]:
         st.write(f"**Path (Start to Finish):** {path[1]} -> {path[2]}")
-        st.write(f"**Path Distance:** {distance} km")
+        st.write(f"**Path Distance:** {distance}")
         st.write("\n")
     
     with cols[1]:
