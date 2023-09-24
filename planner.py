@@ -161,11 +161,13 @@ def charts_and_leaderboard():
         rank = "Silver"
         goal = 1000
         difference = 200
+        nextBadge = "Gold"
     else:
         imageLink = "bronzerank.png"
         rank = "Bronze"
         goal = 800
         difference = 800
+        nextBadge = "Silver"
 
     # Set left sidebar
     col1, col2, col3, col4 = st.sidebar.columns([1, 2, 1, 1])
@@ -178,14 +180,14 @@ def charts_and_leaderboard():
         st.title(str(points)+" Points")
     # image = Image.open(imageLink)
     #st.sidebar.image(image, width=75)
-    
-    progress_text = "Progress until next badge"
-    my_bar = st.sidebar.progress(0, text=progress_text)
-    time.sleep(1)
     if rank == "Gold":
         progressP = 1.0
+        progress_text = "Gold Badge!"
     else:
         progressP = 1-(goal-points)/difference
+        progress_text = str(goal-points)+" points until "+nextBadge
+    my_bar = st.sidebar.progress(0, text=progress_text)
+    time.sleep(1)
     my_bar.progress(progressP, text=progress_text)
     time.sleep(1)
 
@@ -290,7 +292,6 @@ def charts_and_leaderboard():
 
 def getUserId():
     return 'Alice'
-
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
