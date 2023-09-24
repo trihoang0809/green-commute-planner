@@ -78,21 +78,11 @@ def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventN
         return
     
     with cols[0]:
-        st.write(f"**Time When User Finishes Path:** {pathDistances[row][0]}")
-        st.write(f"**Starting Location:** {pathDistances[row][1]}")
-        st.write(f"**Ending Location:** {pathDistances[row][2]}")
+        st.write(f"**Path (Start to Finish):** {pathDistances[row][1]} -> {pathDistances[row][2]}")
         st.write(f"**Path Distance:** {pathDistances[row][3]}")
-        st.write("---")
+        st.write("\n")
     with cols[1]:
         st.text_input('Mode of Transportation Used', key=f'mode{row}') 
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
-        st.write("\n")
         st.write("\n")
 
 if __name__ == '__main__':
