@@ -55,17 +55,18 @@ def site_config(): # Set up configuration for website.
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data.
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
+        pass
+    with col3:
+        user_id = getUserId()
+        st.write("User ID: ", user_id)
+    with col4:
         pass
     with col2:
         center_button = st.button("Input your 7-day calendar", type="primary")
         if center_button:
-            if creds: # If the user is authorized, get the next week's data and return.
-                
-                # Log in the user for the application.
-                login(creds)
-                
+            if creds: # If the user is authorized, get the next week's data and return.     
                 print("getting locations...")
                 weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
                 print("calendar will have new locations...")
@@ -74,8 +75,6 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         else:
             weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
             return weekLocations, startDates
-    with col3 :
-        pass
     return None
         
 def getPaths(weekLocations): # Finds the paths given event locations for the week.
@@ -249,6 +248,13 @@ def charts_and_leaderboard():
 
     plot_data_with_averages(days_of_week, carbon_footprint, 'Carbon Footprint for each day of the week', 'Carbon Footprint')
 
+def getUserId():
+    usernames = [doc.id for doc in db.collection(u'users').stream()]
+    user_id = creds.id_token
+
+    # Fetch data for the selected user
+    return hash(user_id) + hash(usernames[0])
+
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
@@ -256,16 +262,10 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
-def login(creds):
-    user_id = creds.id_token
-    print("\n\nlogin called. THE USER ID: ", user_id, "\n\n")
-    
-    # user_ref = db.collection(u'users').document(selected_user)
-    # user_data = user_ref.get().to_dict()
-
 def log_to_firestore(path, mode, start_date):
     # Assume you have some way of identifying the current user
     user_id = creds.id_token
+    # print("UHHH THE USER ID: ", user_id)
     
     # Prepare data
     data = {
@@ -277,6 +277,7 @@ def log_to_firestore(path, mode, start_date):
     
     # Reference to the current user's document
     user_ref = db.collection("users").document(user_id)
+    print("USER REF: ", user_ref)
     
     # Optionally, you can check if this user document exists, and if not, create it
     # user_ref.set({"some_field": "some_value"}, merge=True)  # The 'merge=True' ensures that the document is created if it doesn't exist
