@@ -300,6 +300,8 @@ def add_row(row, pathDistances, cols, startDates):
         options = ["Select a mode"] + [f"{mode} ({points} points)" for mode, points in points_dict.items()]
         selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0, help="Choose your modes of transportation for this trip")  # index=0 sets the default value to "Select a mode"
         st.write("\n")
+        st.write("\n")
+        st.write("\n")
     
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
     return None if selected_mode == "Select a mode" else selected_mode.split(' ')[0]  # Return only the mode, not the points
