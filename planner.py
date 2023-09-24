@@ -343,7 +343,7 @@ def add_row(row, pathDistances, cols, startDates):
     
     with cols[0]:
         st.write(f"**{path[1]} -> {path[2]}**")
-        st.write(f"**Distance:** {distance} km")
+        st.write(f"**Distance:** {distanceString}")
         st.write(f"**Date:** {startDate}")
         st.write("\n")
     points = None
