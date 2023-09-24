@@ -12,7 +12,6 @@ from google.cloud import firestore
 import plotly.express as px
 import time
 
-
 from PIL import Image
 from scipy.stats import norm
 from streamlit.logger import get_logger
@@ -78,6 +77,8 @@ def site_config(): # Set up configuration for website.
 #     user_ref.collection("events").add(data)
 
 #     user_ref.update({'points_today': firestore.Increment(points_added)})
+
+
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data.
@@ -140,7 +141,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
  
 def main():
     site_config()
-
+    
     weekLocations, startDates = get_calendar_info()
     st.write("\n")
     
