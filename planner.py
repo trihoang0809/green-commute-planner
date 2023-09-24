@@ -285,18 +285,7 @@ def charts_and_leaderboard():
         st.sidebar.markdown(f"Your average carbon footprint is higher than approximately {percentile * 100:.2f}% of Americans. Consider adopting greener commuting options.")
 
     plot_data_with_averages(days_of_week, carbon_footprint, 'Carbon Footprint for each day of the week', 'Carbon Footprint')
-<<<<<<< Updated upstream
-
-def getUserId():
-    usernames = [doc.id for doc in db.collection(u'users').stream()]
-    user_id = creds.id_token
-
-    # Fetch data for the selected user
-    return hash(user_id) + hash(usernames[0])
-
-=======
         
->>>>>>> Stashed changes
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
