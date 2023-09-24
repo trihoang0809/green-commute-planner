@@ -1,6 +1,6 @@
 **GreenCommute: Smart Mobility for a Sustainable Tomorrow**
 
-**TRY IT OUT: https://greencommute.streamlit.app/[](https://greencommute.streamlit.app/)**
+**TRY IT OUT: https://greencommute.streamlit.app/[](url)**
 
 **Overview**
 GreenCommute is a multi-modal transportation planning application that optimizes your commute based on productivity and environmental impact. It aims to tackle climate change by promoting eco-friendly commuting options and integrates productivity tools that help users make the most out of their commute time. Built on Google Cloud's robust infrastructure and featuring a user-friendly dashboard on Streamlit, GreenCommute makes it simple to plan, monitor, and enhance your daily travel while minimizing your carbon footprint.
