@@ -34,14 +34,16 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         pass
     with col2:
         center_button = st.button("Input your 7-day calendar", type="primary")
+        creds = auth.userAuthorization()
         if center_button:
-            creds = auth.userAuthorization()
             if creds:
                 print("getting locations...")
                 weekLocations = calendarDataRetriever.getWeekLocations(creds)
                 print("calendar will have new locations...")
                 print(weekLocations)
                 return weekLocations
+        else:
+            return calendarDataRetriever.getWeekLocations(creds)
     with col3 :
         pass
     return None
@@ -99,7 +101,6 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
-
 def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventName, distInKiloMeters, distInUnits)]
     if not pathDistances:
         st.write("No upcoming events found.")
@@ -110,8 +111,9 @@ def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventN
         st.write(f"**Path Distance:** {pathDistances[row][3]}")
         st.write("\n")
     with cols[1]:
-        st.text_input('Mode of Transportation Used', key=f'mode{row}') 
+        mode = st.text_input('Mode of Transportation Used', key=f'mode{row}') 
         st.write("\n")
+    return mode
 
 if __name__ == '__main__':
     main()

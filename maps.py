@@ -4,6 +4,7 @@ import urllib.parse
 
 import os
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+GOOGLE_MAPS_API_KEY = "AIzaSyBwQ7sisRdtFplasAVzOjPtGQn_zq7cedI"
 
 #
 # Gets the distance between two paths in units according to Distance Matrix from Google Maps API.
