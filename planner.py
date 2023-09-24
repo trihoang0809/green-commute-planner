@@ -54,7 +54,30 @@ def site_config(): # Set up configuration for website.
     )
     st.write("<h1 style='text-align: center;'>Green Commute Planner</h1>",unsafe_allow_html=True)
     st.write("\n")
+# def log_to_firestore(path, mode, start_date, points_added):
+#     # Assume you have some way of identifying the current user
+#     user_id = getUserId()
+#     # print("UHHH THE USER ID: ", user_id)
+    
+#     # Prepare data
+#     data = {
+#         "from": path[1],
+#         "to": path[2],
+#         "mode": mode,
+#         "timestamp": google.cloud.firestore.SERVER_TIMESTAMP  # Adds a server timestamp
+#     }
+    
+#     # Reference to the current user's document
+#     user_ref = db.collection("users").document(user_id)
+#     print("USER REF: ", user_id)
+    
+#     # Optionally, you can check if this user document exists, and if not, create it
+#     # user_ref.set({"some_field": "some_value"}, merge=True)  # The 'merge=True' ensures that the document is created if it doesn't exist
+    
+#     # Add this event data as a new document in the "events" collection inside this user's document
+#     user_ref.collection("events").add(data)
 
+#     user_ref.update({'points_today': firestore.Increment(points_added)})
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data.
@@ -123,8 +146,6 @@ def main():
     
     # Get all paths for the week and calculate the paths' distances.
     pathDistances = None
-    mode_selections = defaultdict(str)  # To store mode selections for each row
-    added_points = defaultdict(int)  # To store points added for each row
 
     if weekLocations:
         pathDistances = getPaths(weekLocations)
@@ -133,16 +154,12 @@ def main():
     if pathDistances:
         cols = st.columns(2)
         for row in range(len(pathDistances)):
-            mode,points = add_row(row, pathDistances, cols, startDates)
-            if mode:
-                mode_selections[row] = mode  # Store the mode selection for this row
-            if points:
-                added_points[row] = points
+            add_row(row, pathDistances, cols, startDates)
         # Add a single Log button to log all selected modes for all paths
-        if st.button("Log All"):
-            for row, mode in mode_selections.items():
-                log_to_firestore(pathDistances[row], mode, startDates[row], added_points[row])
-            st.info("All data logged.")
+        # if st.button("Log All"):
+        #     for row, mode in mode_selections.items():
+        #         log_to_firestore(pathDistances[row], mode, startDates[row], added_points[row])
+        #     st.info("All data logged.")
     
     #implement the charts and the leaderboard
     charts_and_leaderboard()
@@ -319,10 +336,10 @@ def add_row(row, pathDistances, cols, startDates):
     # Add a box around each row for better visibility
     with st.container():
         # Make title look more prominent
-        st.markdown(f"### **{path[1]} ➔ {path[2]}**")
+        st.markdown(f"#### {path[1]} ➔ {path[2]}")
         
         # Create sub-columns for date and distance
-        sub_col1, sub_col2 = st.columns([1, 1])
+        sub_col1, sub_col2, sub_col3 = st.columns([1, 1,1])
         
         with sub_col1:
             # Center and modify text size for distance
@@ -332,10 +349,10 @@ def add_row(row, pathDistances, cols, startDates):
             # Center and modify text size for date
             st.markdown(f"<div style='text-align: center;'><span style='font-size:18px;'>Date</span></div>", unsafe_allow_html=True)
             st.markdown(f"<div style='text-align: center;'><span style='font-size:30px;'>{startDate}</span></div>", unsafe_allow_html=True)
-
-        # Transportation selection at the bottom
-        options = ["Select a mode"] + [f"{mode}" for mode in points_dict.keys()]
-        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)
+        with sub_col3:
+            # Transportation selection at the bottom
+            options = ["Select a mode"] + [f"{mode}" for mode in points_dict.keys()]
+            selected_mode = st.selectbox('Transportation', options, key=f'mode{row}', index=0, help="Choose a mode of transportation for this trip")
         
         if selected_mode != "Select a mode":
             # Extract the selected mode and corresponding points
@@ -349,7 +366,29 @@ def add_row(row, pathDistances, cols, startDates):
                 st.error(f"You just got deducted {points * (-1)} points :(")
     
         st.markdown("<hr>", unsafe_allow_html=True)
+     # Assume you have some way of identifying the current user
+    user_id = getUserId()
+    # print("UHHH THE USER ID: ", user_id)
+    
+    if selected_mode != "Select a mode":
+        # Prepare data
+        data = {
+            "from": path[1],
+            "to": path[2],
+            "mode": selected_mode,
+            "timestamp": google.cloud.firestore.SERVER_TIMESTAMP  # Adds a server timestamp
+        }
+        # Reference to the current user's document
+        user_ref = db.collection("users").document(user_id)
+        print("USER REF: ", user_id)
+        
+        # Optionally, you can check if this user document exists, and if not, create it
+        # user_ref.set({"some_field": "some_value"}, merge=True)  # The 'merge=True' ensures that the document is created if it doesn't exist
+        
+        # Add this event data as a new document in the "events" collection inside this user's document
+        user_ref.collection("events").add(data)
 
+        user_ref.update({'points_today': firestore.Increment(points)})
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
     return None if selected_mode == "Select a mode" else selected_mode.split(' ')[0], None if points is None else points
 
