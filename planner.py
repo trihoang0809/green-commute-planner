@@ -5,6 +5,7 @@ import os.path
 import calendarDataRetriever
 import auth
 import streamlit as st
+import maps
 from streamlit.logger import get_logger
 
 from google.auth.transport.requests import Request
@@ -16,70 +17,71 @@ from googleapiclient.errors import HttpError
 
 LOGGER = get_logger(__name__)
 
-    
-def main():
+def site_config():
     # Set up config for website? (Authenticate the user in order to pull their data for Google Calendar API.)
     st.set_page_config(
         page_title="Green Commute",
         page_icon="🛴",
     )
-
     st.write("# Green Commute Planner")
 
-    creds = None
-
-    if st.button("Log in", type="primary"):
+def get_calendar_info(): # Gets locations from Google Calendar API.
+    needUpdatePaths = False
+    # Loads in calendar data
+    if st.button("Input your 7-day calendar", type="primary"):
         creds = auth.userAuthorization()
-        print("creds initialized")
-    # elif not creds:
-    #    st.write("Please log in")
-
-    # weekLocations = None
-    
-    # if weekLocations:
-    #     display_events(weekLocations)
-
-    # Button to refresh the calendar
-    if st.button("Refresh Calendar", type="primary"):
-        creds = auth.userAuthorization()
-        weekLocations = calendarDataRetriever.getWeekLocations(creds)
-        print("calendar will be refreshed...")
-
-        # Display locations on website.
-        if not creds:
-            display_events(weekLocations)
-
-    # Get all locations in Google Calendar for until the next week from now.
-    if creds:
-        print("getting locations...")
-        weekLocations = calendarDataRetriever.getWeekLocations(creds)
-        print("locations gotten: ", weekLocations)
+        if creds:
+            print("getting locations...")
+            weekLocations = calendarDataRetriever.getWeekLocations(creds)
+            print("calendar will have new locations...")
+            print(weekLocations)
+            return weekLocations
+    return None
         
-        # Display locations on website.
-        display_events(weekLocations)
+def getPaths(weekLocations): # Finds the paths given event locations for the week.
+    pathDistances = []
+    for i in range(len(weekLocations)-1):
+        fromLoc, toLoc = weekLocations[i], weekLocations[i+1]
+        dist = maps.getPathDistance(fromLoc, toLoc)
+        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist)) # (toStartTime, fromEventName, toEventName, dist)
+    return pathDistances
 
+def log_button(): # Places a dropdown bar for selecting mode of transportation.
     transportation = st.selectbox(
     'Which method of transportation do you log?',
     ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
-    if transportation!=None:
-        creds = auth.userAuthorization()
-        weekLocations = calendarDataRetriever.getWeekLocations(creds)
-        display_events(weekLocations)
-
-    if st.button("Log", type="primary"):
-        # Do something else
-        print("transportation has been chosen...")
+    
+    if st.button("Log", type="primary"): # Make the button disappear?
         st.write(transportation)
+        
 
-def display_events(weekLocations):
-    if not weekLocations:
+    
+def main():
+    site_config()
+
+    weekLocations = get_calendar_info()
+    pathDistances = None
+    
+    # Get all paths for the week and calculate the path distance.
+    if weekLocations:
+        pathDistances = getPaths(weekLocations)
+        
+    # Display path distances on site.
+    if pathDistances:
+        display_events(pathDistances)
+
+
+
+def display_events(pathDistances):  # [(toStartTime, fromEventName, toEventName, dist)]
+    if not pathDistances:
         st.write("No upcoming events found.")
         return
     # Loop through events and display them
-    for loc in weekLocations: # loc is of form (eventName, UTCTime, location)
-        st.write(f"**Event:** {loc[0]}")
-        st.write(f"**Start Time:** {loc[1]}")
-        st.write(f"**Location:** {loc[2]}")
+    for path in pathDistances: # loc is of form (eventName, UTCTime, location)
+        st.write(f"**Time When User Finishes Path:** {path[0]}")
+        st.write(f"**Starting Location:** {path[1]}")
+        st.write(f"**Ending Location:** {path[2]}")
+        st.write(f"**Path Distance:** {path[3]}")
         st.write("---")
 
 if __name__ == '__main__':
