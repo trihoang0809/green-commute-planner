@@ -21,7 +21,7 @@ def getPathDistance(fromEvent, toEvent): # inputs are of form (eventName, startT
     http_request += urllib.parse.quote(fromLocation)
     http_request += "&units=imperial"
     http_request += "&key="
-    http_request += GOOGLE_MAPS_API_KEY
+    http_request += 'AIzaSyBwQ7sisRdtFplasAVzOjPtGQn_zq7cedI'
     
     # Send the HTTP request to Google Maps API and store data in JSON.
     json_data = requests.get(http_request).json()
