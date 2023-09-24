@@ -39,6 +39,8 @@ BASE_POINTS_PER_KM = {
     'Car': -5,     # Negative points for driving a car
 }
 
+creds = auth.userAuthorization()
+
 LOGGER = get_logger(__name__)
 db = google.cloud.firestore.Client.from_service_account_json("greencommute-firebase-adminsdk-kcrhl-ea92e0cdba.json")
 
@@ -58,7 +60,6 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         pass
     with col2:
         center_button = st.button("Input your 7-day calendar", type="primary")
-        creds = auth.userAuthorization()
         if center_button:
             if creds: # If the user is authorized, get the next week's data and return.
                 
@@ -136,7 +137,7 @@ def main():
         # Add a single Log button to log all selected modes for all paths
         if st.button("Log All"):
             for row, mode in mode_selections.items():
-                log_to_firestore(pathDistances[row], mode)
+                log_to_firestore(pathDistances[row], mode, startDates[row])
             st.info("All data logged.")
     
     #implement the charts and the leaderboard
@@ -262,11 +263,9 @@ def login(creds):
     # user_ref = db.collection(u'users').document(selected_user)
     # user_data = user_ref.get().to_dict()
 
-def log_to_firestore(path, mode):
+def log_to_firestore(path, mode, start_date):
     # Assume you have some way of identifying the current user
-    # For example, if you have set up Firebase Authentication
-    # user_id = auth.get_current_user_id()
-    user_id = "some_unique_user_id"  # Mock-up user ID for demonstration
+    user_id = creds.id_token
     
     # Prepare data
     data = {
@@ -284,6 +283,8 @@ def log_to_firestore(path, mode):
     
     # Add this event data as a new document in the "events" collection inside this user's document
     user_ref.collection("events").add(data)
+
+    
 
 def add_row(row, pathDistances, cols, startDates):
     path = pathDistances[row]
