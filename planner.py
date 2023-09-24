@@ -299,35 +299,8 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
-def log_to_firestore(path, mode, start_date, points_added):
-    # Assume you have some way of identifying the current user
-    user_id = getUserId()
-    # print("UHHH THE USER ID: ", user_id)
-    
-    # Prepare data
-    data = {
-        "from": path[1],
-        "to": path[2],
-        "mode": mode,
-        "timestamp": google.cloud.firestore.SERVER_TIMESTAMP  # Adds a server timestamp
-    }
-    
-    # Reference to the current user's document
-    user_ref = db.collection("users").document(user_id)
-    print("USER REF: ", user_id)
-    
-    # Optionally, you can check if this user document exists, and if not, create it
-    # user_ref.set({"some_field": "some_value"}, merge=True)  # The 'merge=True' ensures that the document is created if it doesn't exist
-    
-    # Add this event data as a new document in the "events" collection inside this user's document
-    user_ref.collection("events").add(data)
-
-    user_ref.update({'points_today': firestore.Increment(points_added)})
-    
-
 def add_row(row, pathDistances, cols, startDates):
     path = pathDistances[row]
-    distanceString = path[3]
     distance = path[4]
     startDate = startDates[row]
     
@@ -341,30 +314,44 @@ def add_row(row, pathDistances, cols, startDates):
         for mode in EMISSION_FACTORS.keys()
     }
     
-    with cols[0]:
-        st.write(f"**{path[1]} -> {path[2]}**")
-        st.write(f"**Distance:** {distanceString}")
-        st.write(f"**Date:** {startDate}")
-        st.write("\n")
     points = None
-    with cols[1]:
+
+    # Add a box around each row for better visibility
+    with st.container():
+        # Make title look more prominent
+        st.markdown(f"### **{path[1]} ➔ {path[2]}**")
+        
+        # Create sub-columns for date and distance
+        sub_col1, sub_col2 = st.columns([1, 1])
+        
+        with sub_col1:
+            # Center and modify text size for distance
+            st.markdown(f"<div style='text-align: center;'><span style='font-size:18px;'>Distance</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center;'><span style='font-size:30px;'>{distance} km</span></div>", unsafe_allow_html=True)
+        with sub_col2:
+            # Center and modify text size for date
+            st.markdown(f"<div style='text-align: center;'><span style='font-size:18px;'>Date</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center;'><span style='font-size:30px;'>{startDate}</span></div>", unsafe_allow_html=True)
+
+        # Transportation selection at the bottom
         options = ["Select a mode"] + [f"{mode}" for mode in points_dict.keys()]
-        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)  # index=0 sets the default value to "Select a mode"
+        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)
+        
         if selected_mode != "Select a mode":
-        # Extract the selected mode and corresponding points
+            # Extract the selected mode and corresponding points
             mode = selected_mode.split(" ")[0]
             points = points_dict.get(mode, 0)
 
             # Display the message with the calculated points
             if points > 0:
-                st.write(f"You just received {points} points!")
+                st.success(f"You just received {points} points!")
             else:
-                st.write(f"You just got deducted {points * (-1)} points:(")
-        st.write("\n")
+                st.error(f"You just got deducted {points * (-1)} points :(")
     
+        st.markdown("<hr>", unsafe_allow_html=True)
+
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
     return None if selected_mode == "Select a mode" else selected_mode.split(' ')[0], None if points is None else points
-
 
 
 
