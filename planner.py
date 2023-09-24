@@ -113,7 +113,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
     if mode in ['Walk', 'Bike', 'Bus'] and points < 0:
         points = 0  # or any other minimum value you'd like
     
-    return points
+    return points/100
  
 def main():
     site_config()
@@ -150,7 +150,7 @@ def main():
 
 def charts_and_leaderboard():
     # Hardcoded!
-    points = 898
+    points = db.collection(u'users').document(getUserId()).get().to_dict().get('points_today', 0)
 
     # Determine rank from points
     if points >= 1000:
