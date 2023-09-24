@@ -54,6 +54,7 @@ def site_config(): # Set up configuration for website.
     )
     st.write("<h1 style='text-align: center;'>Green Commute Planner</h1>",unsafe_allow_html=True)
     st.write("\n")
+
 # def log_to_firestore(path, mode, start_date, points_added):
 #     # Assume you have some way of identifying the current user
 #     user_id = getUserId()
@@ -81,26 +82,33 @@ def site_config(): # Set up configuration for website.
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data.
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        pass
-    with col3:
-        user_id = getUserId()
-        st.write("User ID: ", user_id)
-    with col4:
-        pass
-    with col2:
-        center_button = st.button("Input your 7-day calendar", type="primary")
-        if center_button:
-            if creds: # If the user is authorized, get the next week's data and return.     
-                print("getting locations...")
-                weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
-                print("calendar will have new locations...")
-                print(weekLocations)
-                return weekLocations, startDates
-        else:
+    # col1, col2, col3, col4 = st.columns(4)
+    # with col1:
+    #     pass
+    # with col3:
+    #     user_id = getUserId()
+    #     st.write("User ID: ", user_id)
+    # with col4:
+    #     pass
+    # with col2:
+    center_button = st.button("Sync with Google Calendar", type="primary")
+    if center_button:
+        try:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', 'https://www.googleapis.com/auth/calendar.readonly')
+            flow.run_local_server(port=0)
+            st.info("Google Calendar synced.")
+        except Exception as e:
+            st.error("Error syncing Google Calendar.")
+        if creds: # If the user is authorized, get the next week's data and return.     
+            print("getting locations...")
             weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
+            print("calendar will have new locations...")
+            print(weekLocations)
             return weekLocations, startDates
+    else:
+        weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
+        return weekLocations, startDates
     return None
         
 def getPaths(weekLocations): # Finds the paths given event locations for the week.
@@ -140,7 +148,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
  
 def main():
     site_config()
-
+    
     weekLocations, startDates = get_calendar_info()
     st.write("\n")
     
