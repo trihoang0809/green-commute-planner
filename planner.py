@@ -62,13 +62,14 @@ def get_calendar_info(): # Gets locations from Google Calendar API.
         if center_button:
             if creds: # If the user is authorized, get the next week's data and return.
                 print("getting locations...")
-                weekLocations = calendarDataRetriever.getWeekLocations(creds)
+                weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
                 print("calendar will have new locations...")
                 print(weekLocations)
-                return weekLocations
+                return weekLocations, startDates
         else:
-            return calendarDataRetriever.getWeekLocations(creds)
-    with col3:
+            weekLocations, startDates = calendarDataRetriever.getWeekLocations(creds)
+            return weekLocations, startDates
+    with col3 :
         pass
     return None
         
@@ -110,7 +111,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
 def main():
     site_config()
 
-    weekLocations = get_calendar_info()
+    weekLocations, startDates = get_calendar_info()
     st.write("\n")
     
     # Get all paths for the week and calculate the paths' distances.
@@ -124,7 +125,7 @@ def main():
     if pathDistances:
         cols = st.columns(2)
         for row in range(len(pathDistances)):
-            mode = add_row(row, pathDistances, cols)
+            mode = add_row(row, pathDistances, cols, startDates)
             if mode:
                 mode_selections[row] = mode  # Store the mode selection for this row
 
@@ -273,9 +274,10 @@ def log_to_firestore(path, mode):
     # Add this event data as a new document in the "events" collection inside this user's document
     user_ref.collection("events").add(data)
 
-def add_row(row, pathDistances, cols):
+def add_row(row, pathDistances, cols, startDates):
     path = pathDistances[row]
-    distance = path[3]
+    distance = path[4]
+    startDate = startDates[row]
     
     if not pathDistances:
         st.write("No upcoming events found.")
@@ -289,12 +291,15 @@ def add_row(row, pathDistances, cols):
     
     with cols[0]:
         st.write(f"**Path (Start to Finish):** {path[1]} -> {path[2]}")
-        st.write(f"**Path Distance:** {distance}")
+        st.write(f"**Path Distance:** {distance} km")
+        st.write(f"**Start Date:** {startDate}")
         st.write("\n")
     
     with cols[1]:
         options = ["Select a mode"] + [f"{mode} ({points} points)" for mode, points in points_dict.items()]
         selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0, help="Choose your modes of transportation for this trip")  # index=0 sets the default value to "Select a mode"
+        st.write("\n")
+        st.write("\n")
         st.write("\n")
     
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
