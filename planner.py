@@ -255,7 +255,7 @@ def charts_and_leaderboard():
     data = {
         "Usernames": [],
         "Points Today": [],
-        "Last 7 Days Total": []
+        #"Last 7 Days Total": []
     }
 
     # Load usernames and data for table
@@ -263,7 +263,7 @@ def charts_and_leaderboard():
         doc_data = doc.to_dict()
         data["Usernames"].append(doc_data.get('username', 'N/A'))
         data["Points Today"].append(doc_data.get('points_today', 0))
-        data["Last 7 Days Total"].append(sum(doc_data.get('last_7_days', {}).values()))
+        #data["Last 7 Days Total"].append(sum(doc_data.get('last_7_days', {}).values()))
 
     # Create and display a DataFrame for leaderboard
     df = pd.DataFrame(data).sort_values("Points Today", ascending=False).set_index("Usernames")
