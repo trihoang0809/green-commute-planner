@@ -45,14 +45,6 @@ def getPaths(weekLocations): # Finds the paths given event locations for the wee
         dist = maps.getPathDistance(fromLoc, toLoc)
         pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist)) # (toStartTime, fromEventName, toEventName, dist)
     return pathDistances
-
-def log_button(): # Places a dropdown bar for selecting mode of transportation.
-    transportation = st.selectbox(
-    'Which method of transportation do you log?',
-    ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
-    
-    if st.button("Log", type="primary"): # Make the button disappear?
-        st.write(transportation)
         
 
     
@@ -68,21 +60,40 @@ def main():
         
     # Display path distances on site.
     if pathDistances:
-        display_events(pathDistances)
+        cols = st.columns(2)
+        for row in range(len(pathDistances)):
+            add_row(row, pathDistances, cols)
+
+def makeModeButton():
+    transportation = st.selectbox(
+        'Which method of transportation do you log?',
+        ('Walk', 'Bike', 'Bus/Train', 'Car', 'Plane'), placeholder="Choose an Option")
+    button = st.button("Log", type="primary")
+    return button, transportation
 
 
-
-def display_events(pathDistances):  # [(toStartTime, fromEventName, toEventName, dist)]
+def add_row(row, pathDistances, cols):  # [(toStartTime, fromEventName, toEventName, dist)]
     if not pathDistances:
         st.write("No upcoming events found.")
         return
-    # Loop through events and display them
-    for path in pathDistances: # loc is of form (eventName, UTCTime, location)
-        st.write(f"**Time When User Finishes Path:** {path[0]}")
-        st.write(f"**Starting Location:** {path[1]}")
-        st.write(f"**Ending Location:** {path[2]}")
-        st.write(f"**Path Distance:** {path[3]}")
+    
+    with cols[0]:
+        st.write(f"**Time When User Finishes Path:** {pathDistances[row][0]}")
+        st.write(f"**Starting Location:** {pathDistances[row][1]}")
+        st.write(f"**Ending Location:** {pathDistances[row][2]}")
+        st.write(f"**Path Distance:** {pathDistances[row][3]}")
         st.write("---")
+    with cols[1]:
+        st.text_input('Mode of Transportation Used', key=f'mode{row}') 
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
 
 if __name__ == '__main__':
     main()

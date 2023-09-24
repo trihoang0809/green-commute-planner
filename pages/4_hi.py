@@ -1,1 +1,0 @@
-st.set_page_config(page_title="Lol Demo", page_icon="📹")
