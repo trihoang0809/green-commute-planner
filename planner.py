@@ -10,6 +10,7 @@ import pandas as pd
 import google.cloud.firestore
 import plotly.express as px
 
+
 from PIL import Image
 from scipy.stats import norm
 from streamlit.logger import get_logger
@@ -20,6 +21,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import google.cloud.firestore
+
 
 # Emission factors per km for different modes of transportation (hypothetical)
 EMISSION_FACTORS = {
@@ -242,9 +244,9 @@ def charts_and_leaderboard():
     percentage_of_americans = (1 - percentile) * 100
 
     if user_average_carbon_footprint < national_average_carbon_footprint:
-        st.sidebar.info(f"Great job! Your average carbon footprint is lower than approximately {percentage_of_americans:.2f}% of Americans.")
+        st.sidebar.markdown(f"Great job! Your average carbon footprint is lower than approximately {percentage_of_americans:.2f}% of Americans.")
     else:
-        st.sidebar.info(f"Your average carbon footprint is higher than approximately {percentile * 100:.2f}% of Americans. Consider adopting greener commuting options.")
+        st.sidebar.markdown(f"Your average carbon footprint is higher than approximately {percentile * 100:.2f}% of Americans. Consider adopting greener commuting options.")
 
     plot_data_with_averages(days_of_week, carbon_footprint, 'Carbon Footprint for each day of the week', 'Carbon Footprint')
 
@@ -304,16 +306,24 @@ def add_row(row, pathDistances, cols, startDates):
     }
     
     with cols[0]:
-        st.write(f"**Path (Start to Finish):** {path[1]} -> {path[2]}")
-        st.write(f"**Path Distance:** {distanceString}")
-        st.write(f"**Start Date:** {startDate}")
+        st.write(f"**{path[1]} -> {path[2]}**")
+        st.write(f"**Distance:** {distance} km")
+        st.write(f"**Date:** {startDate}")
         st.write("\n")
     
     with cols[1]:
-        options = ["Select a mode"] + [f"{mode} ({points} points)" for mode, points in points_dict.items()]
-        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0, help="Choose your modes of transportation for this trip")  # index=0 sets the default value to "Select a mode"
-        st.write("\n")
-        st.write("\n")
+        options = ["Select a mode"] + [f"{mode}" for mode in points_dict.keys()]
+        selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)  # index=0 sets the default value to "Select a mode"
+        if selected_mode != "Select a mode":
+        # Extract the selected mode and corresponding points
+            mode = selected_mode.split(" ")[0]
+            points = points_dict.get(mode, 0)
+
+            # Display the message with the calculated points
+            if points > 0:
+                st.write(f"You just received {points} points!")
+            else:
+                st.write(f"You just got deducted {points * (-1)} points:(")
         st.write("\n")
     
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
