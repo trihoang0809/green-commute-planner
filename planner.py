@@ -8,6 +8,7 @@ import streamlit as st
 import maps
 import pandas as pd
 import google.cloud.firestore
+from google.cloud import firestore
 import plotly.express as px
 import time
 
@@ -21,7 +22,6 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import google.cloud.firestore
 
 
 # Emission factors per km for different modes of transportation (hypothetical)
@@ -113,7 +113,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
     if mode in ['Walk', 'Bike', 'Bus'] and points < 0:
         points = 0  # or any other minimum value you'd like
     
-    return points
+    return points/100
  
 def main():
     site_config()
@@ -124,6 +124,7 @@ def main():
     # Get all paths for the week and calculate the paths' distances.
     pathDistances = None
     mode_selections = defaultdict(str)  # To store mode selections for each row
+    added_points = defaultdict(int)  # To store points added for each row
 
     if weekLocations:
         pathDistances = getPaths(weekLocations)
@@ -132,14 +133,15 @@ def main():
     if pathDistances:
         cols = st.columns(2)
         for row in range(len(pathDistances)):
-            mode = add_row(row, pathDistances, cols, startDates)
+            mode,points = add_row(row, pathDistances, cols, startDates)
             if mode:
                 mode_selections[row] = mode  # Store the mode selection for this row
-
+            if points:
+                added_points[row] = points
         # Add a single Log button to log all selected modes for all paths
         if st.button("Log All"):
             for row, mode in mode_selections.items():
-                log_to_firestore(pathDistances[row], mode, startDates[row])
+                log_to_firestore(pathDistances[row], mode, startDates[row], added_points[row])
             st.info("All data logged.")
     
     #implement the charts and the leaderboard
@@ -148,7 +150,7 @@ def main():
 
 def charts_and_leaderboard():
     # Hardcoded!
-    points = 898
+    points = db.collection(u'users').document(getUserId()).get().to_dict().get('points_today', 0)
 
     # Determine rank from points
     if points >= 1000:
@@ -252,7 +254,7 @@ def charts_and_leaderboard():
 
     # Dropdown to select a user
     usernames = [doc.id for doc in db.collection(u'users').stream()]
-    selected_user = st.selectbox("Select a User", usernames)
+    selected_user = getUserId()
 
     # Fetch data for the selected user
     user_ref = db.collection(u'users').document(selected_user)
@@ -289,12 +291,7 @@ def charts_and_leaderboard():
     plot_data_with_averages(days_of_week, carbon_footprint, 'Carbon Footprint for each day of the week', 'Carbon Footprint')
 
 def getUserId():
-    usernames = [doc.id for doc in db.collection(u'users').stream()]
-    user_id = creds.id_token
-
-    # Fetch data for the selected user
-    return hash(user_id) + hash(usernames[0])
-
+    return 'Alice'
 def makeModeButton():
     transportation = st.selectbox(
         'Which method of transportation do you log?',
@@ -302,9 +299,9 @@ def makeModeButton():
     button = st.button("Log", type="primary")
     return button, transportation
 
-def log_to_firestore(path, mode, start_date):
+def log_to_firestore(path, mode, start_date, points_added):
     # Assume you have some way of identifying the current user
-    user_id = creds.id_token
+    user_id = getUserId()
     # print("UHHH THE USER ID: ", user_id)
     
     # Prepare data
@@ -317,7 +314,7 @@ def log_to_firestore(path, mode, start_date):
     
     # Reference to the current user's document
     user_ref = db.collection("users").document(user_id)
-    print("USER REF: ", user_ref)
+    print("USER REF: ", user_id)
     
     # Optionally, you can check if this user document exists, and if not, create it
     # user_ref.set({"some_field": "some_value"}, merge=True)  # The 'merge=True' ensures that the document is created if it doesn't exist
@@ -325,6 +322,7 @@ def log_to_firestore(path, mode, start_date):
     # Add this event data as a new document in the "events" collection inside this user's document
     user_ref.collection("events").add(data)
 
+    user_ref.update({'points_today': firestore.Increment(points_added)})
     
 
 def add_row(row, pathDistances, cols, startDates):
@@ -348,7 +346,7 @@ def add_row(row, pathDistances, cols, startDates):
         st.write(f"**Distance:** {distance} km")
         st.write(f"**Date:** {startDate}")
         st.write("\n")
-    
+    points = None
     with cols[1]:
         options = ["Select a mode"] + [f"{mode}" for mode in points_dict.keys()]
         selected_mode = st.selectbox('Mode of Transportation Used', options, key=f'mode{row}', index=0)  # index=0 sets the default value to "Select a mode"
@@ -365,7 +363,7 @@ def add_row(row, pathDistances, cols, startDates):
         st.write("\n")
     
     # To handle when "Select a mode" is chosen, you can either return None or the string itself
-    return None if selected_mode == "Select a mode" else selected_mode.split(' ')[0]  # Return only the mode, not the points
+    return None if selected_mode == "Select a mode" else selected_mode.split(' ')[0], None if points is None else points
 
 
 
