@@ -32,7 +32,9 @@ def getPathDistance(fromEvent, toEvent): # inputs are of form (eventName, startT
     # st.write(json_data.get("rows")[0].get("elements")[0].get("distance").get("value"))
     
     # Return the distance given in units
-    return json_data.get("rows")[0].get("elements")[0].get("distance").get("value")
+    dist_str = json_data.get("rows")[0].get("elements")[0].get("distance").get("text")
+    dist_units = json_data.get("rows")[0].get("elements")[0].get("distance").get("value")
+    return dist_str, dist_units
 
 # def main():
 #     fromEvent = ('TEST 2', '2023-09-24T10:00:00-05:00', 'Rockefeller Center, 45 Rockefeller Plaza, New York, NY 10111, USA')

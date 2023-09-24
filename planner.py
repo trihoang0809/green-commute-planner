@@ -24,26 +24,34 @@ def site_config():
         page_icon="🛴",
     )
     st.write("# Green Commute Planner")
+    st.write("\n")
 
 def get_calendar_info(): # Gets locations from Google Calendar API.
     needUpdatePaths = False
     # Loads in calendar data
-    if st.button("Input your 7-day calendar", type="primary"):
-        creds = auth.userAuthorization()
-        if creds:
-            print("getting locations...")
-            weekLocations = calendarDataRetriever.getWeekLocations(creds)
-            print("calendar will have new locations...")
-            print(weekLocations)
-            return weekLocations
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        pass
+    with col2:
+        center_button = st.button("Input your 7-day calendar", type="primary")
+        if center_button:
+            creds = auth.userAuthorization()
+            if creds:
+                print("getting locations...")
+                weekLocations = calendarDataRetriever.getWeekLocations(creds)
+                print("calendar will have new locations...")
+                print(weekLocations)
+                return weekLocations
+    with col3 :
+        pass
     return None
         
 def getPaths(weekLocations): # Finds the paths given event locations for the week.
     pathDistances = []
     for i in range(len(weekLocations)-1):
         fromLoc, toLoc = weekLocations[i], weekLocations[i+1]
-        dist = maps.getPathDistance(fromLoc, toLoc)
-        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist)) # (toStartTime, fromEventName, toEventName, dist)
+        dist_str, dist_units = maps.getPathDistance(fromLoc, toLoc)
+        pathDistances.append((toLoc[1], fromLoc[0], toLoc[0], dist_str)) # (toStartTime, fromEventName, toEventName, dist)
     return pathDistances
         
 
@@ -52,9 +60,10 @@ def main():
     site_config()
 
     weekLocations = get_calendar_info()
-    pathDistances = None
+    st.write("\n")
     
     # Get all paths for the week and calculate the path distance.
+    pathDistances = None
     if weekLocations:
         pathDistances = getPaths(weekLocations)
         
