@@ -136,7 +136,7 @@ def calculate_points(base_points_per_km, emission_factor, distance, mode):
     if mode in ['Walk', 'Bike', 'Bus'] and points < 0:
         points = 0  # or any other minimum value you'd like
     
-    return points/100
+    return round(points/100)
  
 def main():
     site_config()
